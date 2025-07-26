@@ -31,7 +31,7 @@ namespace NuGetSwitch
         }
 
         /// <summary>
-        /// Handles the <see cref="E:Closing" /> event.
+        /// Invoked when closing the application
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
@@ -40,24 +40,14 @@ namespace NuGetSwitch
             MainWindowViewModel viewModel = (MainWindowViewModel) DataContext;
 
             // If the document is dirty, prompt the user to save changes
-            if (!viewModel.IsDirty) 
-                return;
-
-            MessageBoxResult result = MessageBox.Show(this, "Workspace has unsaved changes. Do you want to save them?", "Unsaved Changes", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-
-            switch (result)
+            if (viewModel.IsDirty)
             {
-                case MessageBoxResult.Cancel:
-                    e.Cancel = true;
-                    break;
-                case MessageBoxResult.Yes:
-                    viewModel.CloseSolution();
-                    break; 
+                viewModel.CloseSolution();
             }
         }
 
         /// <summary>
-        /// Invoked when an unhandled <see cref="E:System.Windows.Input.Keyboard.PreviewKeyDown" /> attached event reaches an element in its route that is derived from this class. Implement this method to add class handling for this event.
+        /// Enable deleting selected references using the Delete key
         /// </summary>
         /// <param name="e">The <see cref="T:System.Windows.Input.KeyEventArgs" /> that contains the event data.</param>
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -66,57 +56,10 @@ namespace NuGetSwitch
             {
                 IEnumerable<string> toRemove = LibrariesListBox.SelectedItems.Cast<string>();
 
-                var viewModel = (MainWindowViewModel)DataContext;
+                var viewModel = (MainWindowViewModel) DataContext;
                 viewModel.DeleteSelectedItems(toRemove);
                 e.Handled = true;
             }
-        }
-
-        /// <summary>
-        /// Shows the workspace save file dialog.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="startFolder">The start folder.</param>
-        /// <returns>System.Nullable&lt;System.String&gt;.</returns>
-        public string? ShowWorkspaceSaveFileDialog(string fileName, string startFolder)
-        {
-            // Show save file dialog
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "Workspace (*.json)|*.json",
-                Title = "Save Workspace",
-                InitialDirectory = startFolder,
-                FileName = fileName
-            };
-            if (saveFileDialog.ShowDialog() == false)
-            {
-                return null;
-            }
-
-            return saveFileDialog.FileName;
-
-        }
-
-        /// <summary>
-        /// Shows the workspace open file dialog.
-        /// </summary>
-        /// <param name="startFolder">The start folder.</param>
-        /// <returns>System.Nullable&lt;System.String&gt;.</returns>
-        public string? ShowWorkspaceOpenFileDialog(string startFolder)
-        {
-            // Open a file dialog to select a Workspace
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filter = "Workspace (*.json)|*.json",
-                Title = "Open a Workspace File",
-                InitialDirectory = startFolder
-            };
-            if (openFileDialog.ShowDialog() == false)
-            {
-                return null;
-            }
-
-            return openFileDialog.FileName;
         }
 
         /// <summary>

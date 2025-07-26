@@ -1,7 +1,9 @@
-﻿namespace NuGetSwitch.Model;
+﻿using CommunityToolkit.Diagnostics;
+
+namespace NuGetSwitch.Model;
 
 /// <summary>
-/// Class VsProject.
+/// Represents a Visual Studio project
 /// </summary>
 public class VsProject
 {
@@ -12,6 +14,9 @@ public class VsProject
     /// <param name="projectPath">The project path.</param>
     public VsProject(string projectName, string projectPath)
     {
+        Guard.IsNotNull(projectName);
+        Guard.IsNotNull(projectPath);
+
         ProjectName = projectName;
         ProjectPath = projectPath;
     }

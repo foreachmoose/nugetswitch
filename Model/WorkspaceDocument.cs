@@ -82,6 +82,8 @@ public class WorkspaceDocument
     /// <returns>System.Collections.Generic.IList&lt;System.String&gt;.</returns>
     public IList<string>? GetSelectedLibraries(string packageId)
     {
+        Guard.IsNotNullOrWhiteSpace(packageId);
+
         bool hasSelectedLibraries = SelectedLibraries.TryGetValue(packageId, out var selectedLibraries);
 
         return hasSelectedLibraries ? selectedLibraries : [];
