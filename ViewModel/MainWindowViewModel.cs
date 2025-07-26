@@ -16,8 +16,8 @@ namespace NuGetSwitch.ViewModel
     /// <seealso cref="ObservableObject" />
     public class MainWindowViewModel : ObservableObject
     {
-        // Workspace document file extension
-        private const string FileExtension = ".nugetswitch.tmp";
+        // Workspace document file extension. Use ".tmp" so git ignores it
+        private const string WorkspaceFileExtension = ".nugetswitch.tmp";
 
         // Services
         private readonly IDialogService m_dialogService;
@@ -28,9 +28,6 @@ namespace NuGetSwitch.ViewModel
         private string? m_solutionFilePath;
         private WorkspaceDocument? m_workspaceDocument;
         private List<VsProject> m_projects = [];
-        private ObservableCollection<string> m_nuGetPackageIds = [];
-        private ObservableCollection<string> m_messages = [];
-        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWindowViewModel" /> class.
@@ -88,7 +85,7 @@ namespace NuGetSwitch.ViewModel
         public RelayCommand OpenExplorerCommand { get; }
 
         /// <summary>
-        /// Determines whether this instance [can execute close workspace].
+        /// True if solution can be closed
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteCloseSolution()
@@ -97,7 +94,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Determines whether this instance [can execute open solution].
+        /// True if a solution can be opened
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteOpenSolution()
@@ -106,7 +103,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Determines whether this instance [can execute add local references].
+        /// True if local references can be added
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteAddLocalReferences()
@@ -115,7 +112,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Determines whether this instance [can execute switch].
+        /// True if a switch can be done
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteSwitch()
@@ -124,7 +121,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Determines whether this instance [can execute git undo changes].
+        /// True if Git changes can be undone
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteGitUndoChanges()
@@ -133,14 +130,13 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Determines whether this instance [can open explorer].
+        /// True if Explorer can be opened
         /// </summary>
         /// <returns>System.Boolean.</returns>
         private bool CanExecuteOpenExplorer()
         {
             return m_solutionFilePath != null;
         }
-
 
         /// <summary>
         /// Gets or sets the title.
@@ -153,33 +149,20 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the nu get package ids.
+        /// Gets the list of NuGet package IDs
         /// </summary>
         /// <value>The nu get package ids.</value>
-        public ObservableCollection<string> NuGetPackageIds
-        {
-            get => m_nuGetPackageIds;
-            set
-            {
-                SetProperty(ref m_nuGetPackageIds, value);
-                OnPropertyChanged(nameof(Libraries));
-            }
-        }
+        public ObservableCollection<string> NuGetPackageIds { get; } = [];
 
         /// <summary>
-        /// Gets or sets the messages.
+        /// Gets the status message list
         /// </summary>
         /// <value>The messages.</value>
-        public ObservableCollection<string> Messages
-        {
-            get => m_messages;
-            set => SetProperty(ref m_messages, value);
-        }
+        public ObservableCollection<string> Messages { get; } = [];
 
         /// <summary>
         /// Gets or sets the index of the selected nu get package.
-        /// </summary>
-        /// 
+        /// </summary>/
         /// <value>The index of the selected nu get package.</value>
         public int SelectedNuGetPackageIndex
         {
@@ -195,7 +178,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Gets the libraries.
+        /// Gets the list of selected libraries.
         /// </summary>
         /// <value>The libraries.</value>
         public IEnumerable<string> Libraries
@@ -227,7 +210,7 @@ namespace NuGetSwitch.ViewModel
         public void DeleteSelectedItems(IEnumerable<string> toRemove)
         {
             if (m_workspaceDocument == null)
-                throw new InvalidOperationException("No workspace docuement");
+                throw new InvalidOperationException("No workspace document");
 
             string packageId = NuGetPackageIds[SelectedNuGetPackageIndex];
 
@@ -238,7 +221,7 @@ namespace NuGetSwitch.ViewModel
 
 
         /// <summary>
-        /// Gets the is dirty.
+        /// True if document is dirty
         /// </summary>
         /// <value>The is dirty.</value>
         public bool IsDirty => m_workspaceDocument?.IsDirty ?? false;
@@ -258,7 +241,7 @@ namespace NuGetSwitch.ViewModel
                 }
 
                 // Check if a workspace document already exists
-                string workspaceFile = $"{filePath}{FileExtension}";
+                string workspaceFile = $"{filePath}{WorkspaceFileExtension}";
                 try
                 {
                     WorkspaceDocument? document = await m_storageService.LoadAsync(workspaceFile);
@@ -322,14 +305,14 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Gets the modified project files.
+        /// Gets the modified Visual Studio project files.
         /// </summary>
         /// <value>The modified project files.</value>
         public ObservableCollection<string> ModifiedProjectFiles { get; } = [];
 
 
         /// <summary>
-        /// Refreshes this instance.
+        /// Queries the Git repo and updates the list of modified Visual Studio project files
         /// </summary>
         private void UpdateGitStatus()
         {
@@ -355,7 +338,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Gits the undo changes.
+        /// Reverts any changes made to Visual Studio project files
         /// </summary>
         public void GitUndoChanges()
         {
@@ -386,7 +369,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Switches this instance.
+        /// Switches from NuGet references to local references
         /// </summary>
         public void Switch()
         {
@@ -445,7 +428,7 @@ namespace NuGetSwitch.ViewModel
         }
 
         /// <summary>
-        /// Saves the workspace.
+        /// Closes solution and saves the workspace file.
         /// </summary>
         public async void CloseSolution()
         {
@@ -455,12 +438,13 @@ namespace NuGetSwitch.ViewModel
                     throw new InvalidOperationException("No workspace document");
 
                 // Save next to solution file
-                string workspaceFile = $"{m_solutionFilePath}{FileExtension}";
+                string workspaceFile = $"{m_solutionFilePath}{WorkspaceFileExtension}";
 
                 // Save the current state of the application
                 if (m_workspaceDocument.IsDirty)
                 {
                     await m_storageService.SaveAsync(workspaceFile, m_workspaceDocument);
+                    Messages.Add($"Workspace saved: {m_workspaceDocument}");
                 }
 
                 m_workspaceDocument = null;
@@ -486,7 +470,6 @@ namespace NuGetSwitch.ViewModel
                 NotifyCanExecuteChanged();
             }
         }
-
 
         /// <summary>
         /// Opens the explorer.
@@ -537,9 +520,6 @@ namespace NuGetSwitch.ViewModel
             }
         }
 
-        
-
-        
         /// <summary>
         /// Update the command states based on the current workspace state.
         /// </summary>

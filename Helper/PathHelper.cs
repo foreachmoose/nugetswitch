@@ -4,7 +4,7 @@ using System.IO;
 namespace NuGetSwitch.Helper
 {
     /// <summary>
-    /// Class PathHelper.
+    /// Path helper class
     /// </summary>
     public static class PathHelper
     {
@@ -25,8 +25,8 @@ namespace NuGetSwitch.Helper
             string baseFullPath = Path.GetFullPath(basePath).TrimEnd(Path.DirectorySeparatorChar);
 
             // Split into directory segments
-            var absParts = absFullPath.Split(Path.DirectorySeparatorChar);
-            var baseParts = baseFullPath.Split(Path.DirectorySeparatorChar);
+            string[] absParts = absFullPath.Split(Path.DirectorySeparatorChar);
+            string[] baseParts = baseFullPath.Split(Path.DirectorySeparatorChar);
 
             // Find the common root
             int commonLength = 0;
@@ -38,17 +38,17 @@ namespace NuGetSwitch.Helper
             }
 
             // Navigate back to the common ancestor
-            var relativeParts = new string[baseParts.Length - commonLength];
+            string[] relativeParts = new string[baseParts.Length - commonLength];
             for (int i = 0; i < relativeParts.Length; i++)
             {
                 relativeParts[i] = "..";
             }
 
             // Navigate down to the target path
-            var downParts = absParts[commonLength..];
+            string[] downParts = absParts[commonLength..];
 
             // Combine the parts
-            var fullRelativePath = Path.Combine(Path.Combine(relativeParts), Path.Combine(downParts));
+            string fullRelativePath = Path.Combine(Path.Combine(relativeParts), Path.Combine(downParts));
 
             return string.IsNullOrEmpty(fullRelativePath) ? "." : fullRelativePath;
         }

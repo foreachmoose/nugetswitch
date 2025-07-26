@@ -1,11 +1,12 @@
 ﻿using NuGetSwitch.Model;
 using System.IO;
 using System.Text.RegularExpressions;
+using CommunityToolkit.Diagnostics;
 
 namespace NuGetSwitch.Helper
 {
     /// <summary>
-    /// Class VsSolutionFileHelper.
+    /// Helper class for parsing Visual Studio solution file
     /// </summary>
     public static class VsSolutionFileHelper
     {
@@ -16,14 +17,15 @@ namespace NuGetSwitch.Helper
         /// <returns>List&lt;VsProject&gt;.</returns>
         public static List<VsProject> GetProjectsFromSolution(string solutionFilePath)
         {
-            var projects = new List<VsProject>();
-            var projectLinePattern = new Regex(
-                @"^Project\(""\{[^}]+\}""\)\s*=\s*""([^""]+)"",\s*""([^""]+)"",\s*""\{[^}]+\}""",
-                RegexOptions.Compiled);
+            Guard.IsNotNullOrWhiteSpace(solutionFilePath);
+
+            List<VsProject> projects = [];
+            Regex projectLinePattern = new Regex(@"^Project\(""\{[^}]+\}""\)\s*=\s*""([^""]+)"",\s*""([^""]+)"",\s*""\{[^}]+\}""",
+                    RegexOptions.Compiled);
 
             foreach (var line in File.ReadLines(solutionFilePath))
             {
-                var match = projectLinePattern.Match(line);
+                Match match = projectLinePattern.Match(line);
                 if (match.Success)
                 {
                     string name = match.Groups[1].Value;

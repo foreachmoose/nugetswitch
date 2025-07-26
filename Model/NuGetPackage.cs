@@ -1,5 +1,10 @@
-﻿namespace NuGetSwitch.Model;
+﻿using CommunityToolkit.Diagnostics;
 
+namespace NuGetSwitch.Model;
+
+/// <summary>
+/// Represents a NuGet packag reference
+/// </summary>
 public class NuGetPackage
 {
     /// <summary>
@@ -9,6 +14,9 @@ public class NuGetPackage
     /// <param name="version">The version.</param>
     public NuGetPackage(string packageId, string version)
     {
+        Guard.IsNotNullOrWhiteSpace(packageId);
+        Guard.IsNotNullOrWhiteSpace(version);
+
         PackageId = packageId;
         Version = version;
     }

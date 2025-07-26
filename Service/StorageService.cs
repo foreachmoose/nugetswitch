@@ -5,13 +5,14 @@ using CommunityToolkit.Diagnostics;
 namespace NuGetSwitch.Service
 {
     /// <summary>
-    /// Class StorageService.
+    /// Simple storage service, mainly for storing
+    /// workspace documents
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class StorageService<T> where T : class, new()
     {
         /// <summary>
-        /// Save as an asynchronous operation.
+        /// Saves the document
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="document">The document.</param>
@@ -19,13 +20,14 @@ namespace NuGetSwitch.Service
         public async Task SaveAsync(string filePath, T document)
         {
             Guard.IsNotNullOrEmpty(filePath);
+            Guard.IsNotNull(document);
 
             string json = JsonSerializer.Serialize(document, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(filePath, json);
         }
 
         /// <summary>
-        /// Load as an asynchronous operation.
+        /// Loads a document. Returns null, if it doesn't exist.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>A Task&lt;T&gt; representing the asynchronous operation.</returns>

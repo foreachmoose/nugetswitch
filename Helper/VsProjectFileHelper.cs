@@ -6,7 +6,7 @@ using System.Xml.Linq;
 namespace NuGetSwitch.Helper
 {
     /// <summary>
-    /// Class VsProjectFileHelper.
+    /// Helper for reading Visual Studio project files
     /// </summary>
     public static class VsProjectFileHelper
     {
@@ -28,11 +28,11 @@ namespace NuGetSwitch.Helper
                 XDocument doc = XDocument.Load(csprojPath);
                 XNamespace ns = doc.Root!.GetDefaultNamespace();
 
-                var packageRefs = doc.Descendants(ns + "PackageReference")
+                List<XElement> packageRefs = doc.Descendants(ns + "PackageReference")
                     .Where(p => string.Equals(p.Attribute("Include")?.Value, packageId, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
-                foreach (var refNode in packageRefs)
+                foreach (XElement refNode in packageRefs)
                 {
                     refNode.Remove();
                 }
@@ -77,7 +77,7 @@ namespace NuGetSwitch.Helper
                     doc.Root.Add(itemGroup);
                 }
 
-                foreach (var (referenceName, hintPath) in references)
+                foreach ((string referenceName, string hintPath) in references)
                 {
                     if (string.IsNullOrWhiteSpace(referenceName) || string.IsNullOrWhiteSpace(hintPath))
                     {
@@ -85,7 +85,7 @@ namespace NuGetSwitch.Helper
                         continue;
                     }
 
-                    var existingReference = itemGroup.Elements(ns + "Reference")
+                    XElement? existingReference = itemGroup.Elements(ns + "Reference")
                                                      .FirstOrDefault(r => string.Equals(
                                                          r.Attribute("Include")?.Value,
                                                          referenceName,
@@ -97,7 +97,7 @@ namespace NuGetSwitch.Helper
                     }
                     else
                     {
-                        var newReference = new XElement(ns + "Reference",
+                        XElement newReference = new XElement(ns + "Reference",
                             new XAttribute("Include", referenceName),
                             new XElement(ns + "HintPath", hintPath),
                             new XElement(ns + "Private", "true")
@@ -115,12 +115,14 @@ namespace NuGetSwitch.Helper
         }
 
         /// <summary>
-        /// Gets the nu get packages from project.
+        /// Gets the nuGet packages from project.
         /// </summary>
         /// <param name="projectFilePath">The project file path.</param>
         /// <returns>List&lt;NuGetPackage&gt;.</returns>
         public static List<NuGetPackage> GetNuGetPackagesFromProject(string projectFilePath)
         {
+            Guard.IsNotNullOrWhiteSpace(projectFilePath);
+
             List<NuGetPackage> packages = new List<NuGetPackage>();
             if (!File.Exists(projectFilePath))
                 return packages;
@@ -128,7 +130,7 @@ namespace NuGetSwitch.Helper
             XDocument doc = XDocument.Load(projectFilePath);
             XNamespace ns = doc.Root?.Name.Namespace ?? "";
 
-            foreach (var packageRef in doc.Descendants(ns + "PackageReference"))
+            foreach (XElement packageRef in doc.Descendants(ns + "PackageReference"))
             {
                 string? id = packageRef.Attribute("Include")?.Value;
                 string? version = packageRef.Attribute("Version")?.Value
