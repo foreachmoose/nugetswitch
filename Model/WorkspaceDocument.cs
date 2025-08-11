@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.IO;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Diagnostics;
 
 namespace NuGetSwitch.Model;
@@ -7,7 +8,7 @@ namespace NuGetSwitch.Model;
 /// Represents a workspace document
 /// </summary>
 public class WorkspaceDocument
-{
+{ 
     /// <summary>
     /// Gets or sets a value indicating whether this instance is dirty.
     /// </summary>
@@ -34,23 +35,29 @@ public class WorkspaceDocument
     }
 
     /// <summary>
-    /// Adds the libraries.
+    /// Adds the specified libraries to the workspace document for the given package ID.
     /// </summary>
     /// <param name="packageId">The package identifier.</param>
-    /// <param name="libraries">The libraries.</param>
-    public void AddLocalReferences(string packageId, IEnumerable<string> libraries)
+    /// <param name="libsToAdd">The libraries.</param>
+    public void AddLocalReferences(string packageId, IEnumerable<string> libsToAdd)
     {
         Guard.IsNotNullOrEmpty(packageId);
-        Guard.IsNotNull(libraries);
-        Guard.IsTrue(libraries.Any(), "No libraries to add");
+        Guard.IsNotNull(libsToAdd);
+        Guard.IsTrue(libsToAdd.Any(), "No libraries to add");
 
         if (!SelectedLibraries.ContainsKey(packageId))
         {
             SelectedLibraries.Add(packageId, []);
         }
 
-        List<string> list = SelectedLibraries[packageId];
-        list.AddRange(libraries);
+        List<string> existingLibs = SelectedLibraries[packageId];
+
+        IEnumerable<string?> existingLibNames = existingLibs.Select(Path.GetFileName);
+
+        // Add only those from libsToAdd whose file names aren't already in the list
+        IEnumerable<string> uniqueLibs = libsToAdd.Where(path => !existingLibNames.Contains(Path.GetFileName(path)));
+
+        existingLibs.AddRange(uniqueLibs);
 
         IsDirty = true;
     }

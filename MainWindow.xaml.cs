@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Microsoft.Win32;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using NuGetSwitch.Model;
 using NuGetSwitch.ViewModel;
@@ -54,11 +55,28 @@ namespace NuGetSwitch
         {
             if (e.Key == Key.Delete)
             {
+                // Remember current row
+                int selectedIndex = LibrariesListBox.SelectedIndex;
+
                 IEnumerable<string> toRemove = LibrariesListBox.SelectedItems.Cast<string>();
 
-                var viewModel = (MainWindowViewModel) DataContext;
+                MainWindowViewModel? viewModel = (MainWindowViewModel) DataContext;
                 viewModel.DeleteSelectedItems(toRemove);
                 e.Handled = true;
+
+                // Re-select the next row automatically
+                int newIndex = Math.Min(selectedIndex, LibrariesListBox.Items.Count - 1);
+                if (newIndex >= 0)
+                {
+                    LibrariesListBox.SelectedIndex = newIndex;
+                    LibrariesListBox.Focus();
+
+                    // Re-generate items
+                    LibrariesListBox.UpdateLayout();
+
+                    ListBoxItem? listBoxItem = (ListBoxItem) LibrariesListBox.ItemContainerGenerator.ContainerFromItem(LibrariesListBox.SelectedItem);
+                    listBoxItem.Focus();
+                }
             }
         }
 
