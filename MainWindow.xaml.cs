@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using NuGetSwitch.Model;
 using NuGetSwitch.ViewModel;
 using NuGetSwitch.Service;
 using System.Windows.Media.Imaging;
@@ -23,10 +22,6 @@ namespace NuGetSwitch
             InitializeComponent();
 
             Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Resources/Images/app.png"));
-
-            MainWindowViewModel viewModel = new MainWindowViewModel(this, new StorageService<WorkspaceDocument>());
-
-            DataContext = viewModel;
 
             Closing += OnClosing;
         }

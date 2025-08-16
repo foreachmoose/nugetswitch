@@ -3,7 +3,7 @@
 namespace NuGetSwitch.Model;
 
 /// <summary>
-/// Represents a NuGet packag reference
+/// Represents a NuGet package reference
 /// </summary>
 public class NuGetPackage
 {

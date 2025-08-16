@@ -88,7 +88,8 @@
         <UniformGrid Grid.Row="1" Columns="4" HorizontalAlignment="Center" Margin="0,0,0,10">
             <Button Style="{StaticResource ModernButtonStyle}" Margin="5"  Command="{Binding AddLocalReferencesCommand}">Add Local References...</Button>
             <Button Style="{StaticResource ModernButtonStyle}" Margin="5"  Command="{Binding SwitchCommand}">Switch (NuGet > Local)</Button>
-            <Button Style="{StaticResource ModernButtonStyle}" Margin="5"  Command="{Binding GitUndoChangesCommand}">Git Undo Changes</Button>
+            <Button Style="{StaticResource ModernButtonStyle}" Margin="5"  Command="{Binding DeleteObjFoldersCommand}">Delete \obj Folders</Button>
+            <Button Style="{StaticResource ModernButtonStyle}" Margin="5"  Command="{Binding GitViewModel.GitUndoChangesCommand}">Git Undo Changes</Button>
         </UniformGrid>
 
         <Grid Grid.Row="2">
@@ -119,7 +120,7 @@
 
             <GridSplitter Grid.Column="3" Width="3" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></GridSplitter>
 
-            <DockPanel Grid.Column="4">
+            <DockPanel Grid.Column="4" DataContext="{Binding GitViewModel}">
                 <TextBlock Margin="5,0,5,0" DockPanel.Dock="Top" Padding="4" Background="Gray" VerticalAlignment="Center" Foreground="White">Git Changes (*.csproj)</TextBlock>
                 <ListBox Margin="5,0,5,5" ItemsSource="{Binding ModifiedProjectFiles}"></ListBox>
             </DockPanel>
@@ -127,7 +128,7 @@
 
         <GridSplitter Grid.Row="3" Height="3" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></GridSplitter>
 
-        <DockPanel Grid.Row="4">
+        <DockPanel Grid.Row="4" DataContext="{Binding StatusMessageViewModel}">
             <TextBlock Margin="5,0,5,0" DockPanel.Dock="Top" Padding="4" Background="Gray" Foreground="White">Status</TextBlock>
             <ListBox Margin="5,0,5,5" ItemsSource="{Binding Messages}"></ListBox>
         </DockPanel>
